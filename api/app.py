@@ -5,7 +5,7 @@ import json
 app = Flask(__name__)
 
 # URL do arquivo JSON no Dropbox
-dropbox_url = 'https://www.dropbox.com/scl/fi/bkdqz292n71jsr0e2588q/Venus.json?rlkey=eu6wno4weq9glll69la70sml2&st=sr5mjfes&dl=1'
+dropbox_url = 'https://www.dropbox.com/scl/fi/bkdqz292n71jsr0e2588q/Venus.json?rlkey=eu6wno4weq9glll69la70sml2&st=jg6zln0t&dl=1'
 
 def carregar_dados_json():
     try:
@@ -21,28 +21,15 @@ def carregar_dados_json():
         print(f"Erro ao carregar JSON: {e}")
         return []
 
-@app.route('/api/filmes-series', methods=['GET'])
+@app.route('/api/venus', methods=['GET'])
 def filmes_series():
     # Carregar dados do JSON do Dropbox
     data = carregar_dados_json()
 
-    # Parâmetros de paginação
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('per_page', 25))
-
-    # Cálculo da paginação
-    start = (page - 1) * per_page
-    end = start + per_page
-
-    # Obter a página de dados
-    paginated_data = data[start:end]
-
-    # Retornar dados paginados
+    # Retornar todos os dados sem paginação
     return jsonify({
-        'page': page,
-        'per_page': per_page,
         'total': len(data),
-        'data': paginated_data
+        'data': data
     })
 
 @app.route('/api/pesquisa', methods=['GET'])
@@ -68,24 +55,11 @@ def categoria():
     # Filtrar dados que correspondem à categoria especificada
     resultados = [item for item in data if categoria in item.get('categoria', '').lower()]
 
-    # Parâmetros de paginação
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('per_page', 25))
-
-    # Cálculo da paginação
-    start = (page - 1) * per_page
-    end = start + per_page
-
-    # Aplicar a paginação aos resultados
-    paginated_resultados = resultados[start:end]
-
-    # Retornar dados paginados
+    # Retornar dados sem paginação
     return jsonify({
         'categoria': categoria,
-        'page': page,
-        'per_page': per_page,
         'total': len(resultados),
-        'data': paginated_resultados
+        'data': resultados
     })
 
 if __name__ == '__main__':
