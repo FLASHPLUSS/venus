@@ -21,7 +21,7 @@ def carregar_dados_json():
         print(f"Erro ao carregar JSON: {e}")
         return []
 
-@app.route('/api/venus', methods=['GET'])
+@app.route('/api/filmes-series', methods=['GET'])
 def filmes_series():
     # Carregar dados do JSON do Dropbox
     data = carregar_dados_json()
@@ -40,11 +40,24 @@ def pesquisa():
     # Filtrar dados que contêm o termo de pesquisa no título
     resultados = [item for item in data if termo in item.get('titulo', '').lower()]
 
-    # Retornar todos os resultados de uma vez (sem paginação)
+    # Parâmetros de paginação
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('per_page', 25))
+
+    # Cálculo da paginação
+    start = (page - 1) * per_page
+    end = start + per_page
+
+    # Aplicar a paginação aos resultados
+    paginated_resultados = resultados[start:end]
+
+    # Retornar dados paginados
     return jsonify({
         'termo': termo,
+        'page': page,
+        'per_page': per_page,
         'total': len(resultados),
-        'data': resultados
+        'data': paginated_resultados
     })
 
 @app.route('/api/categoria', methods=['GET'])
@@ -55,11 +68,24 @@ def categoria():
     # Filtrar dados que correspondem à categoria especificada
     resultados = [item for item in data if categoria in item.get('categoria', '').lower()]
 
-    # Retornar dados sem paginação
+    # Parâmetros de paginação
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('per_page', 25))
+
+    # Cálculo da paginação
+    start = (page - 1) * per_page
+    end = start + per_page
+
+    # Aplicar a paginação aos resultados
+    paginated_resultados = resultados[start:end]
+
+    # Retornar dados paginados
     return jsonify({
         'categoria': categoria,
+        'page': page,
+        'per_page': per_page,
         'total': len(resultados),
-        'data': resultados
+        'data': paginated_resultados
     })
 
 if __name__ == '__main__':
